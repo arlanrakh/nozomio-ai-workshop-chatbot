@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import {
@@ -14,11 +13,13 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { Markdown } from "@/components/markdown";
 
+// Helper function to decode base64 data URLs
 const getTextFromDataUrl = (dataUrl: string) => {
   const base64 = dataUrl.split(",")[1];
   return window.atob(base64);
 };
 
+// Component to show preview of text files with 100 char limit
 function TextFilePreview({ file }: { file: File }) {
   const [content, setContent] = useState<string>("");
 
@@ -40,17 +41,20 @@ function TextFilePreview({ file }: { file: File }) {
 }
 
 export default function Home() {
+  // Initialize chat functionality with error handling
   const { messages, input, handleSubmit, handleInputChange, isLoading } =
     useChat({
       onError: () =>
         toast.error("You've been rate limited, please try again later!"),
     });
 
+  // State for file handling and drag-drop functionality
   const [files, setFiles] = useState<FileList | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null); // Reference for the hidden file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Handle pasted files (images and text only)
   const handlePaste = (event: React.ClipboardEvent) => {
     const items = event.clipboardData?.items;
 
@@ -76,6 +80,7 @@ export default function Home() {
     }
   };
 
+  // Drag and drop event handlers
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(true);
@@ -109,8 +114,8 @@ export default function Home() {
     setIsDragging(false);
   };
 
+  // Auto-scroll functionality for messages
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -119,12 +124,7 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-  // Function to handle file selection via the upload button
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Function to handle files selected from the file dialog
+  // File validation helper (used in multiple handlers)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
     if (selectedFiles) {
@@ -141,6 +141,11 @@ export default function Home() {
         toast.error("Only image and text files are allowed");
       }
     }
+  };
+
+  // Function to handle file selection via the upload button
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
